@@ -2,7 +2,6 @@ use std::env;
 use std::process::Command;
 
 fn main() {
-
     println!("cargo:warning=BUILD SCRIPT RUNNING");
     println!("cargo:warning=cwd={:?}", env::current_dir());
 
@@ -55,9 +54,9 @@ fn main() {
 
     // make && make install
     let status = Command::new("make")
-    .current_dir(&xpdf_dir)
-    .status()
-    .expect("failed to run make");
+        .current_dir(&xpdf_dir)
+        .status()
+        .expect("failed to run make");
 
     assert!(status.success(), "make failed");
 
@@ -71,5 +70,3 @@ fn main() {
 
     println!("cargo:warning=cwd=HERE5");
 }
-
-
