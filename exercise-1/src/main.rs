@@ -1,20 +1,21 @@
+use libafl::corpus::{Corpus, InMemoryCorpus, OnDiskCorpus};
+use libafl::events::SimpleEventManager;
+use libafl::executors::ForkserverExecutor;
+use libafl::feedbacks::{MaxMapFeedback, TimeFeedback, TimeoutFeedback};
+use libafl::inputs::BytesInput;
+use libafl::monitors::SimpleMonitor;
+use libafl::mutators::{havoc_mutations, StdScheduledMutator};
+use libafl::observers::{CanTrack, HitcountsMapObserver, StdMapObserver, TimeObserver};
+use libafl::schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler};
+use libafl::stages::StdMutationalStage;
+use libafl::state::{HasCorpus, StdState};
+use libafl::{feedback_and_fast, feedback_or, Error, Fuzzer, StdFuzzer};
+use libafl_bolts::rands::StdRand;
+use libafl_bolts::shmem::{ShMem, ShMemProvider, StdShMemProvider};
+use libafl_bolts::tuples::tuple_list;
+use libafl_bolts::{current_nanos, AsSliceMut};
 use std::path::PathBuf;
-
-use libafl::{
-    corpus::{InMemoryCorpus, OnDiskCorpus},
-    events::SimpleEventManager,
-    feedback_and_fast, feedback_or,
-    feedbacks::{MaxMapFeedback, TimeFeedback, TimeoutFeedback},
-    inputs::BytesInput,
-    monitors::SimpleMonitor,
-    observers::{CanTrack, HitcountsMapObserver, StdMapObserver, TimeObserver},
-    state::StdState,
-};
-use libafl_bolts::{
-    current_nanos,
-    rands::StdRand,
-    shmem::{ShMem, ShMemProvider, StdShMem, StdShMemProvider},
-};
+use std::time::Duration;
 
 fn main() {
     let corpus_dir = vec![PathBuf::from("./corpus")];
@@ -64,4 +65,22 @@ fn main() {
     let monitor = SimpleMonitor::new(|s| println!("{s}"));
 
     let mut mgr = SimpleEventManager::new(state);
+
+    let scheduler = IndexesLenTimeMinimizerScheduler::new(&edges_observer, QueueScheduler::new());
+
+    let mut fuzzer = StdFuzzer::new(scheduler, feedback, objective);
+
+
+    let mut executor = ForkserverExecutor::builder()
+        .program("./xpdf/install/bin/pdftotext")
+        .timeout(Duration::from_secs(5))
+        .parse_afl_cmdline(["@@"])
+        .coverage_map_size(MAP_SIZE)
+        .build(tuple_list!(time_observer, edges_observer))?;
+
+    let mutator = StdScheduledMutator::new(havoc_mutations());
+    let mut stages = tuple_list!(StdMutationalStage::new(mutator));
+
+    fuzzer.fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr).expect("Error in the fuzzing loop");
+
 }
