@@ -27,6 +27,9 @@ hostinfo               = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: /home/shourya/.rbenv/shims
+PATH: /home/shourya/gems/bin
+PATH: /home/shourya/gems/bin
 PATH: /home/shourya/.local/bin
 PATH: /home/shourya/.rbenv/shims
 PATH: /home/shourya/.rbenv/bin
@@ -602,9 +605,9 @@ configure:6638: $? = 0
 configure:6650: result: yes
 configure:6664: checking for fseek64
 configure:6721: /usr/local/bin/afl-clang-fast -o conftest -g -O2   conftest.c  >&5
-/usr/bin/ld: /tmp/conftest-bd8f8d.o: in function `main':
+/usr/bin/ld: /tmp/conftest-923a74.o: in function `main':
 conftest.c:(.text.main[main]+0x19): undefined reference to `fseek64'
-/usr/bin/ld: /tmp/conftest-bd8f8d.o:(.data+0x0): undefined reference to `fseek64'
+/usr/bin/ld: /tmp/conftest-923a74.o:(.data+0x0): undefined reference to `fseek64'
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:6727: $? = 1
 configure: failed program was:
@@ -674,9 +677,9 @@ configure: failed program was:
 configure:6752: result: no
 configure:6768: checking for ftell64
 configure:6825: /usr/local/bin/afl-clang-fast -o conftest -g -O2   conftest.c  >&5
-/usr/bin/ld: /tmp/conftest-b27964.o: in function `main':
+/usr/bin/ld: /tmp/conftest-57a159.o: in function `main':
 conftest.c:(.text.main[main]+0x19): undefined reference to `ftell64'
-/usr/bin/ld: /tmp/conftest-b27964.o:(.data+0x0): undefined reference to `ftell64'
+/usr/bin/ld: /tmp/conftest-57a159.o:(.data+0x0): undefined reference to `ftell64'
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:6831: $? = 1
 configure: failed program was:

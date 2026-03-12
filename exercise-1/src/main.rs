@@ -4,16 +4,16 @@ use libafl::executors::ForkserverExecutor;
 use libafl::feedbacks::{MaxMapFeedback, TimeFeedback, TimeoutFeedback};
 use libafl::inputs::BytesInput;
 use libafl::monitors::SimpleMonitor;
-use libafl::mutators::{havoc_mutations, ScheduledMutator};
+use libafl::mutators::{ScheduledMutator, havoc_mutations};
 use libafl::observers::{CanTrack, HitcountsMapObserver, StdMapObserver, TimeObserver};
 use libafl::schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler};
 use libafl::stages::StdMutationalStage;
 use libafl::state::{HasCorpus, StdState};
-use libafl::{feedback_and_fast, feedback_or, Error, Fuzzer, StdFuzzer};
+use libafl::{Error, Fuzzer, StdFuzzer, feedback_and_fast, feedback_or};
 use libafl_bolts::rands::StdRand;
 use libafl_bolts::shmem::{ShMem, ShMemProvider, StdShMemProvider};
 use libafl_bolts::tuples::tuple_list;
-use libafl_bolts::{current_nanos, AsSliceMut};
+use libafl_bolts::{AsSliceMut, current_nanos};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -116,7 +116,6 @@ fn main() {
     // perspective, so its more or less an implementation details.
     let monitor = SimpleMonitor::new(|s| println!("{s}"));
 
-
     //
     // Component: EventManager
     //
@@ -124,7 +123,6 @@ fn main() {
     // such as the notification of the addition of a new testcase to the corpus. The SimpleEventManager
     // is the simplest event manager available to us.
     let mut mgr: SimpleEventManager<_, _, _> = SimpleEventManager::new(monitor);
-
 
     //
     // Component: State
@@ -159,7 +157,7 @@ fn main() {
     // a QueueCorpusScheduler walks the corpus ina queue like fashion
     let scheduler = IndexesLenTimeMinimizerScheduler::new(&edges_observer, QueueScheduler::new());
 
-    // 
+    //
     // Component: Fuzzer
     //
     // A fuzzer with feedback, objectives and a corpus scheduler
@@ -168,7 +166,7 @@ fn main() {
     //
     // Component: Executor
     //
-    // Creates an in-process executor. The timeoutExecutor wraps the InProcessExecutor and sets a 
+    // Creates an in-process executor. The timeoutExecutor wraps the InProcessExecutor and sets a
     // timeout before each run. This gives us an executor that will execute a bunch of testcases
     // within the same process, eliminating a lot of the overhead associated with fork/exec or
     // forkserver execution model.
@@ -178,7 +176,6 @@ fn main() {
         .parse_afl_cmdline(["@@"])
         .coverage_map_size(MAP_SIZE)
         .build(tuple_list!(time_observer, edges_observer))?;
-
 
     //
     // Component: Mutator
@@ -190,6 +187,7 @@ fn main() {
     //
     let mut stages = tuple_list!(StdMutationalStage::new(mutator));
 
-    fuzzer.fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr).expect("Error in the fuzzing loop");
-
+    fuzzer
+        .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)
+        .expect("Error in the fuzzing loop");
 }
