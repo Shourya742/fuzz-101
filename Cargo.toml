@@ -2,7 +2,7 @@
 
 members = [
     "exercise-1"
-, "exercise-2"]
+, "exercise-2", "exercise-3"]
 
 
 [profile.release]
